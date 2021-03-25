@@ -1,5 +1,12 @@
-<h1>This is the show page</h1>
-<h2><%=post%></h2>
+<h2><%=post.title%></h2>
+<div>Price: <%=post.price%></div>
+<div><%=post.description%></div>
+<div><%=post.location%></div>
+<div>
+    <% post.images.forEach(function(image){%>
+        <img src="<%=image.url%>" alt="Car Image" width='200px'>
+    <%});%>
+</div>
 <div><a href="/posts/<%=post.id%>/edit">
     <button>Edit post</button>
     </a></div>

@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 const PostSchema = new Schema({
     title: String,
     price: Number,
-    images: [String],
+    images: [{url:String,public_id:String}],
     description:String,
     location: String,
     lat: Number,

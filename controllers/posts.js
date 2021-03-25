@@ -1,4 +1,10 @@
 const Post = require('../models/post');
+const cloudinary = require('cloudinary');
+cloudinary.config({
+    cloud_name: 'ishamss',
+    api_key: '763372858651651',
+    api_secret: process.env.CLOUDINARY_SECRET
+});
 module.exports = {
     async getPosts(req,res,next) {
         let posts = await Post.find({});
@@ -9,7 +15,16 @@ module.exports = {
         res.render('posts/new');
     },
     //create a new post and add it to the database
-    async createPost(req,res,next) {
+    async createPost(req, res, next) {
+        req.body.post.images = [];
+        //for every req.files is an array of files containing the images
+        for (const file of req.files) {
+            let image = await cloudinary.v2.uploader.upload(file.path);
+            req.body.post.images.push({
+                url: image.secure_url,
+                public_id: image.public_id
+            });
+        }
         let newPost = await Post.create(req.body.post);
         res.redirect(`/posts/${newPost.id}`);
     },
