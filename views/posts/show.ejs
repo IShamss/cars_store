@@ -1,0 +1,10 @@
+<h1>This is the show page</h1>
+<h2><%=post%></h2>
+<div><a href="/posts/<%=post.id%>/edit">
+    <button>Edit post</button>
+    </a></div>
+<div>
+    <form action="/posts/<%=post.id%>?_method=DELETE" method=POST>
+        <button>Delete post</button>
+    </form>
+</div>

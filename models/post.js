@@ -6,6 +6,7 @@ const PostSchema = new Schema({
     title: String,
     price: Number,
     images: [String],
+    description:String,
     location: String,
     lat: Number,
     lng: Number,
