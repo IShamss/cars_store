@@ -76,12 +76,18 @@ module.exports = {
         post.price = req.body.post.price;
         post.location = req.body.post.location;
         //then update the database
-        post.save();
+        await post.save();
         res.redirect(`/posts/${post.id}`);
     },
     //delete a post with id
     async deletePost(req, res, next) {
-        await Post.findByIdAndRemove(req.params.id);
+        let post = await Post.findById(req.params.id);
+        //delete the images form cloudinary
+        for (const image of post.images) {
+            await cloudinary.v2.uploader.destroy(image.public_id);
+        }
+        //then delete the post from the database
+        await post.remove();
         res.redirect('/posts');
     }
 }
