@@ -40,7 +40,43 @@ module.exports = {
     },
     //updatign a post
     async updatePost(req, res, next) {
-        let post = await Post.findByIdAndUpdate(req.params.id, req.body.post);
+        //find the post by its id
+        let post = await Post.findById(req.params.id);
+        //check if there are images to be deleted
+        if (req.body.deleteImages && req.body.deleteImages.length) {
+            let deleteImages = req.body.deleteImages;
+            //loop over the array
+            for (const imageIdToDelete of deleteImages) {
+                //delete the image from cloudinary
+                await cloudinary.v2.uploader.destroy(imageIdToDelete);
+                //here image refers to the public id of the image to be deleted from cloudinary
+                //then delete this image from post images in the database
+                for (const image of post.images) {
+                    if (image.public_id === imageIdToDelete) {
+                        let index = post.images.indexOf(image);
+                        post.images.splice(index, 1);
+                    }
+                }
+            }
+        }
+        //check if there are new images to be uploaded
+        if (req.files) {
+            for (const file of req.files) {
+                let image = await cloudinary.v2.uploader.upload(file.path);
+                //add the image to the array of images of this post
+                post.images.push({
+                    url: image.secure_url,
+                    public_id: image.public_id
+                });
+            }
+        }
+        //update the post with any new properties
+        post.title = req.body.post.title;
+        post.description = req.body.post.description;
+        post.price = req.body.post.price;
+        post.location = req.body.post.location;
+        //then update the database
+        post.save();
         res.redirect(`/posts/${post.id}`);
     },
     //delete a post with id

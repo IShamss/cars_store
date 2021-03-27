@@ -1,9 +1,41 @@
 <h1>Edit Post</h1>
 
-<form action="/posts/<%=post.id%>?_method=PUT" method='POST'>
+<form action="/posts/<%=post.id%>?_method=PUT" method='POST' id='editPostForm' enctype="multipart/form-data">
     <input type="text" name='post[title]' placeholder="Title" value='<%=post.title %>'>
     <input type="text" name='post[price]' placeholder="Price" value='<%=post.price %>'>
+    <div>
+        <input type="file" id='imageUpload' accept='images/*' name='images' multiple>
+        <div>
+        <% post.images.forEach(function(image,i){ %>
+            <img src="<%=image.url%>" alt="Car Image" width='200px'>
+            <label for="image<%=i%>">Delete?</label>
+            <input type="checkbox" name='deleteImages[]' class='imageDeleteCheckbox' id="image<%=i%>" value='<%=image.public_id%>'>
+            <!-- note that ids in html must be unique -->
+        <%});%>
+        </div>
+    </div>
     <textarea name="post[description]" placeholder="Description"><%=post.description%></textarea>
     <input type="text" name='post[location]' placeholder="Location" value='<%=post.location %>'>
     <input type="submit">
 </form>
+
+<script>
+    //get the form element
+    let editPostForm = document.getElementById('editPostForm');
+    //add submit listener on the form
+    editPostForm.addEventListener('submit',function(e){
+        //find the length of uploaded images
+        let imageUploads = document.getElementById('imageUpload').files.length;
+        //find the number of existing images
+        let existingImgs=document.querySelectorAll('.imageDeleteCheckbox').length;
+        //find the number of deletions
+        let deleteImgs=document.querySelectorAll('.imageDeleteCheckbox:checked').length;
+        //check if the form can be submitted by calculating the total number of images
+        let total = imageUploads + existingImgs - deleteImgs;
+        if(total >5){
+            e.preventDefault();
+            alert(`You need to remove at least ${total-5} image${(total-5) === 1 ?'':'s'}`);
+        }
+    });
+
+</script>
